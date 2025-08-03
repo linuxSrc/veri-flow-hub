@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import ParticleBackground from "@/components/ParticleBackground";
 import WalletConnection from "@/components/WalletConnection";
@@ -18,20 +19,33 @@ interface WalletData {
 }
 
 const Index = () => {
+  const navigate = useNavigate();
   const [walletData, setWalletData] = useState<WalletData | null>(null);
   const [currentStep, setCurrentStep] = useState<"connect" | "role" | "dashboard">("connect");
 
   const handleWalletConnected = (wallet: WalletData) => {
     setWalletData(wallet);
+    // Store in localStorage for persistence
+    localStorage.setItem("vericred_wallet", JSON.stringify(wallet));
     setCurrentStep("role");
   };
 
   const handleRoleSelected = (role: "student" | "university") => {
     if (walletData) {
-      setWalletData({ ...walletData, role });
+      const updatedWallet = { ...walletData, role };
+      setWalletData(updatedWallet);
+      
+      // Store in localStorage for persistence
+      localStorage.setItem("vericred_wallet", JSON.stringify(updatedWallet));
+      
       setCurrentStep("dashboard");
-      // Here you would redirect to the appropriate dashboard
-      console.log(`Redirecting to ${role} dashboard`);
+      
+      // Redirect based on role
+      if (role === "student") {
+        navigate("/dashboard");
+      } else {
+        navigate("/university"); // Will create this later
+      }
     }
   };
 
